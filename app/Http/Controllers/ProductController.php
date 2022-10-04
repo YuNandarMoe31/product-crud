@@ -37,9 +37,8 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Product $product)
     {
-        $product = Product::find($id);
         return $product;
     }
 
@@ -50,9 +49,8 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ProductUpdateRequest $request, $id)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
-        $product = Product::find($id);
         $product->update($request->only('name', 'price'));
         return $product;
     }
@@ -63,9 +61,8 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete($id)
+    public function delete(Product $product)
     {
-        $product = Product::find($id);
         $product->delete();
         return $product;
     }
