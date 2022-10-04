@@ -2,7 +2,7 @@
     <div class="container my-5">
         <div class="row justify-content-end mb-3">
             <div class="col-4">
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" @click="create">
                     Create
                 </button>
             </div>
@@ -10,18 +10,18 @@
         <div class="row">
             <div class="col-4">
                 <div class="card">
-                    <h4 class="card-header">Create</h4>
+                    <h4 class="card-header">{{ isEditMode ? "Edit" : "Create" }}</h4>
                     <div class="card-body">
-                        <form action="">
+                        <form @submit.prevent="store">
                             <div class="form-group">
                                 <label>Name: </label>
-                                <input type="text" class="form-control" />
+                                <input v-model="product.name" type="text" class="form-control" />
                             </div>
                             <div class="form-group mt-3">
                                 <label>Price: </label>
-                                <input type="number" class="form-control" />
+                                <input v-model="product.price" type="number" class="form-control" />
                             </div>
-                            <button class="btn btn-primary mt-3">
+                            <button type="submit" class="btn btn-primary mt-3">
                                 Save
                             </button>
                         </form>
@@ -44,10 +44,10 @@
                             <td>{{ product.name }}</td>
                             <td>{{ product.price }}</td>
                             <td>
-                                <button class="btn btn-success btn-sm mx-2">
+                                <button class="btn btn-success btn-sm mx-2" @click="edit(product)">
                                     Edit
                                 </button>
-                                <button class="btn btn-danger btn-sm">
+                                <button class="btn btn-danger btn-sm" @click="destroy(product.id)">
                                     Delete
                                 </button>
                             </td>
@@ -63,14 +63,56 @@
 export default {
     data() {
         return {
-            products: []
+            isEditMode: false,
+            products: [],
+            product: {
+                id: '',
+                name: '',
+                price: ''
+            }
+        }
+    },
+    methods: {
+        view() {
+            axios.get('api/product')
+            .then(response => {
+                this.products = response.data
+            })
+        },
+        create() {
+            this.isEditMode = false;
+            this.product.id = '';
+            this.product.name = '';
+            this.product.price = '';
+        },
+        store() {
+            axios.post('api/product', this.product)
+            .then(response => {
+                this.view();
+                this.create();
+            })
+        },
+        edit(product) {
+            this.isEditMode = true;
+            this.product.id = product.id;
+            this.product.name = product.name;
+            this.product.price = product.price;
+        },
+        update() {
+            axios.put(`api/product/${this.product.id}`, this.product)
+            .then(response => {
+                this.product.id = '';
+                this.product.name = '';
+                this.product.price = '';
+            })
+        },
+        destroy(id) {
+            axios.delete(`/api/product/${id}`)
+            .then(response => this.view());
         }
     },
     created() {
-        axios.get('api/product')
-        .then(response => {
-            this.products = response.data
-        })
+        this.view();
     }
 };
 </script>
