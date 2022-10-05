@@ -49,7 +49,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ProductUpdateRequest $request, Product $product)
+    public function update(Request $request, Product $product)
     {
         $product->update($request->only('name', 'price'));
         return $product;
@@ -61,7 +61,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete(Product $product)
+    public function destroy(Product $product)
     {
         $product->delete();
         return $product;

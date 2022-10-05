@@ -15,11 +15,11 @@
                         <form @submit.prevent="store">
                             <div class="form-group">
                                 <label>Name: </label>
-                                <input v-model="product.name" type="text" class="form-control" />
+                                <input v-model="form.name" type="text" class="form-control" />
                             </div>
                             <div class="form-group mt-3">
                                 <label>Price: </label>
-                                <input v-model="product.price" type="number" class="form-control" />
+                                <input v-model="form.price" type="number" class="form-control" />
                             </div>
                             <button type="submit" class="btn btn-primary mt-3">
                                 Save
@@ -61,11 +61,12 @@
 
 <script>
 export default {
+    name: 'ProductComponent',
     data() {
         return {
             isEditMode: false,
             products: [],
-            product: {
+            form: {
                 id: '',
                 name: '',
                 price: ''
@@ -81,12 +82,12 @@ export default {
         },
         create() {
             this.isEditMode = false;
-            this.product.id = '';
-            this.product.name = '';
-            this.product.price = '';
+            this.form.id = '';
+            this.form.name = '';
+            this.form.price = '';
         },
         store() {
-            axios.post('api/product', this.product)
+            axios.post('api/product', this.form)
             .then(response => {
                 this.view();
                 this.create();
@@ -94,21 +95,21 @@ export default {
         },
         edit(product) {
             this.isEditMode = true;
-            this.product.id = product.id;
-            this.product.name = product.name;
-            this.product.price = product.price;
+            this.form.id = product.id;
+            this.form.name = product.name;
+            this.form.price = product.price;
         },
         update() {
-            axios.put(`api/product/${this.product.id}`, this.product)
+            axios.put(`api/product/${this.form.id}`, this.form)
             .then(response => {
-                this.product.id = '';
-                this.product.name = '';
-                this.product.price = '';
+                this.view();
             })
         },
         destroy(id) {
             axios.delete(`/api/product/${id}`)
-            .then(response => this.view());
+            .then(response => {
+                this.view();
+            });
         }
     },
     created() {
