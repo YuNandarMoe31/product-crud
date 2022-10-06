@@ -12,14 +12,20 @@
                 <div class="card">
                     <h4 class="card-header">{{ isEditMode ? "Edit" : "Create" }}</h4>
                     <div class="card-body">
-                        <form @submit.prevent="store">
+                        <form @submit.prevent="isEditMode ? update() : store()">
                             <div class="form-group">
                                 <label>Name: </label>
                                 <input v-model="form.name" type="text" class="form-control" />
-                            </div>
+                                <template v-if="errors.name">
+                                    <p v-text="errors.name" class="text-danger text-sm"></p>
+                                </template>
+                            </div>     
                             <div class="form-group mt-3">
                                 <label>Price: </label>
                                 <input v-model="form.price" type="number" class="form-control" />
+                                <template v-if="errors.price">
+                                    <p v-text="errors.price" class="text-danger text-sm"></p>
+                                </template>
                             </div>
                             <button type="submit" class="btn btn-primary mt-3">
                                 Save
@@ -70,7 +76,8 @@ export default {
                 id: '',
                 name: '',
                 price: ''
-            }
+            },
+            errors: {}
         }
     },
     methods: {
@@ -81,28 +88,50 @@ export default {
             })
         },
         create() {
+            this.errors = {};
             this.isEditMode = false;
             this.form.id = '';
             this.form.name = '';
             this.form.price = '';
         },
         store() {
+            this.errors = {};
             axios.post('api/product', this.form)
             .then(response => {
                 this.view();
-                this.create();
+                this.form.id = '';
+                this.form.name = '';
+                this.form.price = '';
+            }).catch(error => {
+                if (error.response) {
+                    let errors = error.response.data.errors;
+                    for (let key in errors) {
+                        this.errors[key] = errors[key][0]
+                    }
+                }
             })
         },
         edit(product) {
+            this.errors = {};
             this.isEditMode = true;
             this.form.id = product.id;
             this.form.name = product.name;
             this.form.price = product.price;
         },
-        update() {
+        update() {           
             axios.put(`api/product/${this.form.id}`, this.form)
             .then(response => {
                 this.view();
+                this.form.id = '';
+                this.form.name = '';
+                this.form.price = '';
+            }).catch(error => {
+                if (error.response) {
+                    let errors = error.response.data.errors;
+                    for (let key in errors) {
+                        this.errors[key] = errors[key][0]
+                    }
+                }
             })
         },
         destroy(id) {
