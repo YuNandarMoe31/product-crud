@@ -76,7 +76,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="product in products" :key="product.id">
+                        <tr v-for="product in products.data" :key="product.id">
                             <td>{{ product.id }}</td>
                             <td>{{ product.name }}</td>
                             <td>{{ product.price }}</td>
@@ -97,18 +97,27 @@
                         </tr>
                     </tbody>
                 </table>
+                <pagination
+                    :data="products"
+                    @pagination-change-page="view"
+                ></pagination>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import LaravelVuePagination from "laravel-vue-pagination";
+
 export default {
     name: "ProductComponent",
+    components: {
+        Pagination: LaravelVuePagination,
+    },
     data() {
         return {
             isEditMode: false,
-            products: [],
+            products: {},
             search: "",
             form: {
                 id: "",
@@ -120,9 +129,8 @@ export default {
     },
     methods: {
         searchProduct() {
-            axios.get("api/product?search=" + this.search)
-            .then(response => {
-                this.products = response.data
+            axios.get("api/product?search=" + this.search).then((response) => {
+                this.products = response.data;
             });
         },
         view(page = 1) {
